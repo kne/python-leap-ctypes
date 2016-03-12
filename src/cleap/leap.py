@@ -66,7 +66,7 @@ class Vector(object):
     def __init__(self, vector):
         self.points = tuple(vector.points)
 
-    def __str__(self):
+    def __repr__(self):
         return ('{0}({1:.2f}, {2:.2f}, {3:.2f})'
                 ''.format(self.__class__.__name__, *self.points))
 
@@ -79,15 +79,14 @@ class Finger(object):
         self.velocity = Vector(finger.velocity)
         self.direction = Vector(finger.direction)
 
-    def __str__(self):
-        return ('{0}({1} position={2} velocity={3} direction={4})'
+    def __repr__(self):
+        return ('{0}({1}, position={2}, velocity={3}, direction={4})'
                 ''.format(self.__class__.__name__, self.id_, self.position,
                           self.velocity, self.direction)
                 )
 
 
 class Hand(object):
-
     def __init__(self, hand):
         self.sphere_radius = hand.sphere_radius
         self.palm_position = Vector(hand.palm_position)
@@ -97,59 +96,49 @@ class Hand(object):
         for i in range(hand.finger_count):
             self.fingers.append(Finger(hand.fingers[i]))
 
-    def __str__(self):
-        rtn = ('{0}(sphere_radius={1} palm_position={2} '
-               'palm_normal={3} direction={4}'
-               ''.format(self.__class__.__name__, self.sphere_radius,
-                         self.palm_position, self.palm_normal, self.direction)
-               )
-        for f in self.fingers:
-            rtn += ' ' + str(f)
-        rtn += '.'
-        return rtn
+    def __repr__(self):
+        return ('{0}(sphere_radius={1}, palm_position={2}, '
+                'palm_normal={3}, direction={4}, fingers={5})'
+                ''.format(self.__class__.__name__, self.sphere_radius,
+                          self.palm_position, self.palm_normal, self.direction,
+                          self.fingers))
 
 
 class Bounds(object):
-
     def __init__(self, bounds):
         self.center = Vector(bounds.center)
         self.size = Vector(bounds.size)
 
-    def __str__(self):
-        return ('<{0} size={1} center{2}>'
+    def __repr__(self):
+        return ('{0}(size={1}, center={2})'
                 ''.format(self.__class__.__name__, self.size, self.center)
                 )
 
 
 class Frame(object):
-
     def __init__(self, frame):
         self.id_ = frame.id
         self.timestamp = frame.timestamp
         self.bounds = Bounds(frame.bounds)
-        self.hands = []
-        for i in range(frame.hand_count):
-            self.hands.append(Hand(frame.hands[i]))
+        self.hands = [Hand(hand) for hand in frame.hands[:frame.hand_count]]
 
-    def __str__(self):
-        rtn = ('<{0} {1} timestamp={2} bounds={3}'
-               ''.format(self.__class__.__name__, self.id_, self.timestamp,
-                         str(self.bounds)))
-        for h in self.hands:
-            rtn += ' ' + str(h)
-        rtn += '>'
-        return rtn
+    def __repr__(self):
+        return ('{0}(id_={1}, timestamp={2}, bounds={3}, hands={4})'
+                ''.format(self.__class__.__name__, self.id_, self.timestamp,
+                          self.bounds, self.hands))
 
 
 class Event(object):
-
     def __init__(self, event):
         event = event.contents
         self.code = event.event_code
         self.frame = Frame(event.frame)
 
-    def __str__(self):
-        return '<{0} frame={1}>'.format(self.code, self.frame)
+    def __repr__(self):
+        return ('{0.__class__.__name__}(code={0.code}, '
+                'frame={0.frame})'
+                ''.format(self)
+                )
 
 
 def initialize_cleap(library_path=None, library_filename=None):
