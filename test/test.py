@@ -15,19 +15,28 @@ l = leap_listener(500)
 leap_add_listener(c, l)
 leap_enable_background(c)
 
-counter = 0
-while counter < 1000:
-  waiting = False
-  while not waiting:
-    event = leap_poll_listener(l)
-    if event:
-      e = Event(event)
-      counter += 1
-      print(e)
-    else:
-      waiting = True
-  time.sleep(0.01)
+try:
+    while True:
+      waiting = False
+      while not waiting:
+        event = leap_poll_listener(l)
+        if event:
+          e = Event(event)
+          if not e.frame.hands:
+              continue
 
-leap_remove_listener(c, l)
-leap_listener_dispose(l)
-leap_controller_dispose(c)
+          print('----')
+          for hand in e.frame.hands:
+              print(hand)
+        else:
+          waiting = True
+      time.sleep(0.01)
+except KeyboardInterrupt:
+    pass
+finally:
+    print()
+    print('Done')
+
+    leap_remove_listener(c, l)
+    leap_listener_dispose(l)
+    leap_controller_dispose(c)
