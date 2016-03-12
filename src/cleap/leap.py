@@ -2,7 +2,6 @@ import os
 import sys
 
 import ctypes
-from ctypes import *
 
 LEAP_ON_INIT = 0x0001
 LEAP_ON_CONNECT = 0x0002
@@ -13,52 +12,52 @@ LEAP_ON_FOCUS_GAINED = 0x0006
 LEAP_ON_FOCUS_LOST = 0x0007
 
 
-class LEAP_VECTOR(Structure):
+class LEAP_VECTOR(ctypes.Structure):
     _fields_ = [
-        ('points', c_float * 3),
+        ('points', ctypes.c_float * 3),
     ]
 
 
-class LEAP_FINGER(Structure):
+class LEAP_FINGER(ctypes.Structure):
     _fields_ = [
-        ('id', c_int),
+        ('id', ctypes.c_int),
         ('position', LEAP_VECTOR),
         ('velocity', LEAP_VECTOR),
         ('direction', LEAP_VECTOR),
     ]
 
 
-class LEAP_HAND(Structure):
+class LEAP_HAND(ctypes.Structure):
     _fields_ = [
-        ('finger_count', c_int),
+        ('finger_count', ctypes.c_int),
         ('fingers', LEAP_FINGER * 5),
         ('palm_position', LEAP_VECTOR),
         ('palm_normal', LEAP_VECTOR),
         ('direction', LEAP_VECTOR),
-        ('sphere_radius', c_float),
+        ('sphere_radius', ctypes.c_float),
     ]
 
 
-class LEAP_BOUNDS(Structure):
+class LEAP_BOUNDS(ctypes.Structure):
     _fields_ = [
         ('center', LEAP_VECTOR),
         ('size', LEAP_VECTOR),
     ]
 
 
-class LEAP_FRAME(Structure):
+class LEAP_FRAME(ctypes.Structure):
     _fields_ = [
-        ('id', c_long),
-        ('timestamp', c_long),
-        ('hand_count', c_int),
+        ('id', ctypes.c_long),
+        ('timestamp', ctypes.c_long),
+        ('hand_count', ctypes.c_int),
         ('hands', LEAP_HAND * 2),
         ('bounds', LEAP_BOUNDS),
     ]
 
 
-class LEAP_EVENT(Structure):
+class LEAP_EVENT(ctypes.Structure):
     _fields_ = [
-        ('event_code', c_int),
+        ('event_code', ctypes.c_int),
         ('frame', LEAP_FRAME)
     ]
 
@@ -81,13 +80,10 @@ class Finger(object):
         self.direction = Vector(finger.direction)
 
     def __str__(self):
-        return '{0}({1} position={2} velocity={3} direction={4})'.format(
-            self.__class__.__name__,
-            self.id_,
-            self.position,
-            self.velocity,
-            self.direction
-        )
+        return ('{0}({1} position={2} velocity={3} direction={4})'
+                ''.format(self.__class__.__name__, self.id_, self.position,
+                          self.velocity, self.direction)
+                )
 
 
 class Hand(object):
@@ -178,29 +174,29 @@ def initialize_cleap(library_path=None, library_filename=None):
         raise ImportError('Unable to load leap DLLs')
 
     # Create a controller
-    LEAP.leap_controller.restype = c_void_p
+    LEAP.leap_controller.restype = ctypes.c_void_p
 
     # Enable tracking when focus is lost on a controller
-    LEAP.leap_enable_background.argtypes = [c_void_p]
+    LEAP.leap_enable_background.argtypes = [ctypes.c_void_p]
 
     # Dispose of a controller
-    LEAP.leap_controller_dispose.argtypes = [c_void_p]
+    LEAP.leap_controller_dispose.argtypes = [ctypes.c_void_p]
 
     # Create a listener with a sized internal buffer.
     # At most the most recent size elements will be queued.
-    LEAP.leap_listener.argtypes = [c_int]
-    LEAP.leap_listener.restype = c_void_p
+    LEAP.leap_listener.argtypes = [ctypes.c_int]
+    LEAP.leap_listener.restype = ctypes.c_void_p
 
     # Dispose of a listener
-    LEAP.leap_listener_dispose.argtypes = [c_void_p]
+    LEAP.leap_listener_dispose.argtypes = [ctypes.c_void_p]
 
     # Bind a listener to a controller
-    LEAP.leap_add_listener.argtypes = [c_void_p, c_void_p]
+    LEAP.leap_add_listener.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
 
     # Remove a listener from a controller
-    LEAP.leap_remove_listener.argtypes = [c_void_p, c_void_p]
+    LEAP.leap_remove_listener.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
 
     # Fetch the next queued event
-    LEAP.leap_poll_listener.argtypes = [c_void_p]
-    LEAP.leap_poll_listener.restype = POINTER(LEAP_EVENT)
+    LEAP.leap_poll_listener.argtypes = [ctypes.c_void_p]
+    LEAP.leap_poll_listener.restype = ctypes.POINTER(LEAP_EVENT)
     return LEAP
