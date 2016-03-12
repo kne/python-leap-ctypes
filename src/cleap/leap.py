@@ -58,10 +58,11 @@ class LEAP_EVENT(Structure):
 
 class Vector(object):
   def __init__(self, vector):
-    self.points = (vector.points[0], vector.points[1], vector.points[2])
+    self.points = tuple(vector.points)
 
   def __str__(self):
-    return '<{0} {1:.2f} {2:.2f} {3:.2f}>'.format(self.__class__, *self.points)
+    return ('{0}({1:.2f}, {2:.2f}, {3:.2f})'
+            ''.format(self.__class__.__name__, *self.points))
 
 
 class Finger(object):
@@ -72,8 +73,8 @@ class Finger(object):
     self.direction = Vector(finger.direction)
 
   def __str__(self):
-    return '<{0} {1} position:{2} velocity:{3} direction:{4}>'.format(
-      self.__class__,
+    return '{0}({1} position={2} velocity={3} direction={4})'.format(
+      self.__class__.__name__,
       self.id_,
       self.position,
       self.velocity,
@@ -93,10 +94,10 @@ class Hand(object):
 
   def __str__(self):
     rtn = (
-      '<{0} sphere_radius:{1} palm_position:{2} '
-      'palm_normal:{3} direction:{4}'
+      '{0}(sphere_radius={1} palm_position={2} '
+      'palm_normal={3} direction={4}'
     ).format(
-      self.__class__,
+      self.__class__.__name__,
       self.sphere_radius,
       self.palm_position,
       self.palm_normal,
@@ -114,8 +115,8 @@ class Bounds(object):
     self.size = Vector(bounds.size)
 
   def __str__(self):
-    return '<{0} size:{1} center{2}>'.format(
-      self.__class__, self.size, self.center
+    return '<{0} size={1} center{2}>'.format(
+      self.__class__.__name__, self.size, self.center
     )
 
 
@@ -129,8 +130,8 @@ class Frame(object):
       self.hands.append(Hand(frame.hands[i]))
 
   def __str__(self):
-    rtn = '<{0} {1} timestamp:{2} bounds:{3}'.format(
-      self.__class__,
+    rtn = '<{0} {1} timestamp={2} bounds={3}'.format(
+      self.__class__.__name__,
       self.id_,
       self.timestamp,
       str(self.bounds)
@@ -148,7 +149,7 @@ class Event(object):
     self.frame = Frame(event.frame)
 
   def __str__(self):
-    return '<{0} frame:{1}>'.format(self.code, self.frame)
+    return '<{0} frame={1}>'.format(self.code, self.frame)
 
 
 # Create a controller
